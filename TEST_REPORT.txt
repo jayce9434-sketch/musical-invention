@@ -1,0 +1,60 @@
+KNOCK A BUG: OVERHAUL - QA REPORT
+
+Automated browser and static checks were run against the final Overhaul build.
+
+CORE / STATIC
+PASS - game.js passes Node syntax validation.
+PASS - page initializes with zero JavaScript page errors.
+PASS - no duplicate HTML ids.
+PASS - no JavaScript #id references point to missing HTML elements.
+PASS - 5 map cards render.
+PASS - 10 bug cards render.
+PASS - 8 knocker cards render.
+PASS - 6 Cell mutations render.
+PASS - 6 Scrap Run Gadgets render.
+PASS - 25-contract system is present (5 contracts for each of 5 maps).
+PASS - save migration/reset paths are present.
+
+GAMEPLAY
+PASS - KNOCK starts a live physics run.
+PASS - distance income pays during flight, so missing scenery does not create a zero-Coin run.
+PASS - finished runs award guaranteed run Cells.
+PASS - Ground, Mid, High, and Sky reward routes render.
+PASS - top-of-screen safety pushes excessively high launches back into playable reward space and gives a Skyline reward.
+PASS - GLIDE and DIVE pointer controls work and consume/recharge Air Control energy.
+PASS - Cell and Scrap route pickups are present.
+PASS - map-specific payday gates trigger regardless of altitude.
+PASS - object smashes award Scrap.
+PASS - random run challenges update and can award Coins, Cells, Scrap, and Momentum.
+PASS - Field Capsule progression advances and resets after opening.
+PASS - random run event system includes Golden Run, Low Gravity, Coin Storm, Scrap Rush, and Cell Surge.
+PASS - Souvenir collectibles and permanent collection state are present.
+PASS - bug Mastery rewards are present.
+
+EARLY ECONOMY SMOKE TEST
+Clean-save six-launch Backyard test with a short GLIDE input on each launch:
+Launch 1: 1,271 Coins / 1 Cell / 1 Scrap
+Launch 2: 1,983 Coins / 2 Cells / 2 Scrap
+Launch 3: 5,537 Coins / 10 Cells / 11 Scrap
+Launch 4: 5,907 Coins / 11 Cells / 12 Scrap
+Launch 5: 7,345 Coins / 13 Cells / 20 Scrap; Field Capsule completed/reset
+Launch 6: 9,060 Coins / 20 Cells / 26 Scrap; Momentum x1.08
+PASS - every tested run produced useful progression.
+PASS - Cells are available immediately instead of being a rare late-game-only resource.
+PASS - Scrap appears early enough to begin Gadget progression.
+
+MOBILE / IPAD LAYOUT
+Test viewport: 390 x 844 CSS pixels.
+PASS - document scroll width equals client width (390 px): no page-level horizontal overflow.
+PASS - no JavaScript page errors.
+PASS - KNOCK and in-flight controls remain usable.
+PASS - run challenge, Momentum, Field Capsule, and Air Control information remains readable.
+PASS - anti-double-tap/callout/text-selection protections are included for touch gameplay UI.
+
+VISUAL QA
+PASS - five current-build screenshots were generated directly from the running game canvas.
+PASS - map-specific decorative passes are visible in Backyard, Kitchen, Apartment Hallway, Sewer, and Laboratory.
+PASS - bug and knocker cards use vector illustrations rather than text-only placeholders.
+
+PROGRESSION DESIGN
+The Grand Run completion path now depends on multiple systems rather than only purchasing upgrades: map contracts, maps, bugs, knockers, bug Mastery, Souvenirs, run challenges, mutations, Gadgets, and permanent upgrades. Economy costs and late-map multipliers are intended to place a normal first full journey around the multi-hour range rather than a short session. Exact playtime varies by skill and route choices.

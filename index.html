@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#0b111a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Knock a Bug: Overhaul</title>
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand-wrap">
+      <div class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div><div class="brand-title-row"><h1>Knock a Bug</h1><span class="version-pill">OVERHAUL</span></div><p id="mapSubtitle">Backyard · Flowerbeds and wind lanes</p></div>
+    </div>
+    <div class="currency-row">
+      <div class="currency"><span>Coins</span><strong id="coinsText">0</strong></div>
+      <div class="currency cyan"><span>Cells</span><strong id="cellsText">0</strong></div>
+      <div class="currency scrap"><span>Scrap</span><strong id="scrapText">0</strong></div>
+      <button id="settingsBtn" class="icon-btn" type="button" aria-label="Settings">SET</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="game-shell">
+      <div class="run-hud">
+        <div class="hud-card"><span>TARGET</span><strong id="targetName">Ant</strong><small id="targetLevel">Mastery 1</small></div>
+        <div class="hud-card"><span>KNOCKER</span><strong id="knockerName">Hand</strong><small id="knockerPower">Power 1.00x</small></div>
+        <div class="hud-card"><span>RUN COINS</span><strong id="runCoins">0</strong><small id="comboReadout">Combo x1.0</small></div>
+        <div class="hud-card emphasis"><span>BEST</span><strong id="bestDistance">0.0 m</strong><small id="bestMap">Backyard</small></div>
+      </div>
+
+      <div class="canvas-wrap" id="canvasWrap">
+        <canvas id="gameCanvas" width="1280" height="720" aria-label="Knock a Bug game area"></canvas>
+        <div id="distanceBanner" class="distance-banner" aria-live="polite">Aim for the green timing zone.</div>
+        <div id="comboBanner" class="combo-banner"></div>
+        <div id="eventBanner" class="event-banner hidden"></div>
+        <div class="meter-panel">
+          <div class="meter-label-row"><span>TIMING</span><span id="timingText">READY</span></div>
+          <div class="timing-meter" id="timingMeter" aria-hidden="true">
+            <div class="meter-zone poor left"></div><div class="meter-zone good left"></div><div class="meter-zone perfect"></div><div class="meter-zone good right"></div><div class="meter-zone poor right"></div><div id="meterNeedle" class="meter-needle"></div>
+          </div>
+          <button id="knockBtn" class="knock-btn" type="button">KNOCK</button>
+        </div>
+      </div>
+
+      <div class="ability-row">
+        <button class="ability-btn" id="megaBtn" type="button"><span>Mega Knock</span><small id="megaState">Ready</small></button>
+        <button class="ability-btn" id="boostBtn" type="button"><span>Air Boost</span><small id="boostState">Ready</small></button>
+        <button class="ability-btn" id="coinBtn" type="button"><span>Coin Magnet</span><small id="coinState">Ready</small></button>
+        <button class="ability-btn" id="slamBtn" type="button"><span>Ground Slam</span><small id="slamState">Ready</small></button>
+      </div>
+
+      <div class="flight-control-row">
+        <button id="glideBtn" class="flight-btn" type="button"><span>GLIDE</span><small>Hold to rise / stay high</small></button>
+        <div class="energy-wrap">
+          <div class="energy-head"><span>AIR CONTROL</span><strong id="energyText">100%</strong></div>
+          <div class="energy-track"><i id="energyFill"></i></div>
+          <small id="routeHint">All heights pay. Choose a route during flight.</small>
+        </div>
+        <button id="diveBtn" class="flight-btn dive" type="button"><span>DIVE</span><small>Hold to drop / chase low routes</small></button>
+      </div>
+
+      <div class="run-loop-bar">
+        <div><span>RUN CHALLENGE</span><strong id="runChallengeText">Launch to receive a challenge</strong></div>
+        <div><span>MOMENTUM</span><strong id="momentumText">x1.00</strong></div>
+        <div><span>FIELD CAPSULE</span><strong id="capsuleText">0 / 5 knocks</strong></div>
+      </div>
+    </section>
+
+    <section class="retention-grid">
+      <article class="panel journey-panel">
+        <div class="panel-heading"><div><span class="eyebrow">GRAND RUN</span><h2>Completion Journey</h2></div><strong id="completionText">0%</strong></div>
+        <div class="progress-track"><div id="completionBar" class="progress-fill"></div></div>
+        <div class="journey-stats"><span id="journeyMaps">1/5 maps</span><span id="journeyBugs">1/10 bugs</span><span id="journeyKnockers">1/8 knockers</span><span id="journeyContracts">0/25 contracts</span><span id="journeySouvenirs">0/15 souvenirs</span><span id="journeyChallenges">0 challenge wins</span></div>
+      </article>
+
+      <article class="panel contracts-panel">
+        <div class="panel-heading"><div><span class="eyebrow">ACTIVE OBJECTIVES</span><h2>Map Contracts</h2></div><div class="map-progress" id="contractMapName">Backyard</div></div>
+        <div id="contractCards" class="contract-list"></div>
+      </article>
+
+      <article class="panel map-panel">
+        <div class="panel-heading"><div><span class="eyebrow">WORLD TOUR</span><h2>Maps</h2></div><div class="map-progress"><span id="mapsUnlockedText">1 / 5 unlocked</span></div></div>
+        <div id="mapCards" class="map-cards"></div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-heading"><div><span class="eyebrow">ARSENAL</span><h2>Knockers</h2></div></div>
+        <div id="knockerCards" class="upgrade-list compact"></div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-heading"><div><span class="eyebrow">BUG COLLECTION</span><h2>Targets & Mastery</h2></div></div>
+        <div id="bugCards" class="upgrade-list"></div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-heading"><div><span class="eyebrow">WORKSHOP</span><h2>Permanent Upgrades</h2></div></div>
+        <div id="statCards" class="stat-grid"></div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-heading"><div><span class="eyebrow">CELL LAB</span><h2>Mutations</h2></div><div class="map-progress">Cells now come from runs, mastery, capsules and contracts</div></div>
+        <div id="mutationCards" class="stat-grid"></div>
+      </article>
+
+      <article class="panel gadget-panel">
+        <div class="panel-heading"><div><span class="eyebrow">SCRAP WORKSHOP</span><h2>Run Gadgets</h2></div><div class="map-progress">Spend Scrap on systems that change how runs play</div></div>
+        <div id="gadgetCards" class="stat-grid gadget-grid"></div>
+      </article>
+
+      <article class="panel field-panel">
+        <div class="panel-heading"><div><span class="eyebrow">FIELD DISCOVERY</span><h2>Souvenirs & Run Loop</h2></div><div class="map-progress"><span id="souvenirCount">0 / 15 found</span></div></div>
+        <div class="field-grid">
+          <div class="field-loop-card"><span class="field-kicker">Every run</span><strong>Route + Challenge</strong><p>Steer toward ground, mid, high, or sky trails. Complete the random run challenge to build Momentum.</p></div>
+          <div class="field-loop-card"><span class="field-kicker">Every 5 knocks</span><strong>Field Capsule</strong><p>Guaranteed Cells and Scrap, plus a coin burst. Capsule gadgets can make them arrive faster.</p></div>
+          <div class="field-loop-card"><span class="field-kicker">Hidden on maps</span><strong>15 Souvenirs</strong><p>Three permanent finds per map. They appear on long routes and pay a discovery jackpot.</p></div>
+        </div>
+        <div id="souvenirCards" class="souvenir-grid"></div>
+      </article>
+
+      <article class="panel codex-panel">
+        <div class="panel-heading"><div><span class="eyebrow">RECORD BOOK</span><h2>Career</h2></div></div>
+        <div class="career-grid">
+          <div><span>Total knocks</span><strong id="careerKnocks">0</strong></div>
+          <div><span>Total coins</span><strong id="careerCoins">0</strong></div>
+          <div><span>Pickups</span><strong id="careerPickups">0</strong></div>
+          <div><span>Best combo</span><strong id="careerCombo">x1.0</strong></div>
+          <div><span>Cells earned</span><strong id="careerCells">0</strong></div>
+          <div><span>Scrap earned</span><strong id="careerScrap">0</strong></div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal-card">
+      <div class="modal-title-row"><h2 id="settingsTitle">Settings</h2><button class="close-btn" data-close="settingsModal" type="button">Close</button></div>
+      <label class="slider-row"><span>Music volume <b id="musicVolText">75%</b></span><input id="musicVol" type="range" min="0" max="2000" value="75"></label>
+      <label class="slider-row"><span>SFX volume <b id="sfxVolText">100%</b></span><input id="sfxVol" type="range" min="0" max="2000" value="100"></label>
+      <label class="toggle-row"><span>Screen shake</span><input id="shakeToggle" type="checkbox" checked></label>
+      <label class="toggle-row"><span>Reduced effects</span><input id="reducedFxToggle" type="checkbox"></label>
+      <div class="settings-actions"><button id="testSoundBtn" type="button">Test Sound</button><button id="ownerOpenBtn" type="button">Owner Panel</button><button id="resetBtn" class="danger" type="button">Reset Save Data</button></div>
+      <p class="fineprint">Audio begins after your first tap because iOS requires interaction before sound can play.</p>
+    </div>
+  </div>
+
+  <div id="ownerModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="ownerTitle">
+    <div class="modal-card owner-card">
+      <div class="modal-title-row"><h2 id="ownerTitle">Owner Panel</h2><button class="close-btn" data-close="ownerModal" type="button">Close</button></div>
+      <div id="ownerLogin"><label class="text-input-row"><span>Owner code</span><input id="ownerCode" type="password" autocomplete="off" spellcheck="false"></label><button id="ownerLoginBtn" class="primary-wide" type="button">Unlock</button><p id="ownerError" class="error-text"></p></div>
+      <div id="ownerControls" class="hidden"><div class="owner-grid"><button data-owner-action="coins" type="button">+1,000,000 Coins</button><button data-owner-action="cells" type="button">+250 Cells</button><button data-owner-action="scrap" type="button">+500 Scrap</button><button data-owner-action="maps" type="button">Unlock Maps</button><button data-owner-action="bugs" type="button">Unlock Bugs</button><button data-owner-action="knockers" type="button">Unlock Knockers</button><button data-owner-action="contracts" type="button">Complete Contracts</button><button data-owner-action="maxstats" type="button">Max Upgrades</button><button data-owner-action="clearflight" type="button">Reset Current Flight</button></div><button id="ownerCloseSave" class="primary-wide" type="button">Save Changes</button></div>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal-card small-card"><h2 id="confirmTitle">Reset everything?</h2><p>This clears progression, mastery, contracts, records, currencies, unlocks, and settings.</p><div class="confirm-actions"><button id="cancelResetBtn" type="button">Cancel</button><button id="confirmResetBtn" class="danger" type="button">Reset</button></div></div>
+  </div>
+  <div id="toast" class="toast" aria-live="polite"></div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
